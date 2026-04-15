@@ -3,6 +3,7 @@ using System;
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,45 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260415212321_AddMatches")]
+    partial class AddMatches
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
-
-            modelBuilder.Entity("Backend.Models.Comment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("ParentCommentId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("PostId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ParentCommentId");
-
-                    b.HasIndex("PostId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Comments");
-                });
 
             modelBuilder.Entity("Backend.Models.Match", b =>
                 {
@@ -72,37 +42,6 @@ namespace Backend.Migrations
                     b.HasIndex("User2Id");
 
                     b.ToTable("Matches");
-                });
-
-            modelBuilder.Entity("Backend.Models.Message", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MatchId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("SenderId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("SentAt")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MatchId");
-
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("Backend.Models.Person", b =>
@@ -211,37 +150,9 @@ namespace Backend.Migrations
                     b.Property<string>("Photo")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ProfilePhoto")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Backend.Models.Comment", b =>
-                {
-                    b.HasOne("Backend.Models.Comment", "ParentComment")
-                        .WithMany("Replies")
-                        .HasForeignKey("ParentCommentId");
-
-                    b.HasOne("Backend.Models.Post", "Post")
-                        .WithMany("Comments")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Backend.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ParentComment");
-
-                    b.Navigation("Post");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Backend.Models.Match", b =>
@@ -261,25 +172,6 @@ namespace Backend.Migrations
                     b.Navigation("User1");
 
                     b.Navigation("User2");
-                });
-
-            modelBuilder.Entity("Backend.Models.Message", b =>
-                {
-                    b.HasOne("Backend.Models.Match", "Match")
-                        .WithMany()
-                        .HasForeignKey("MatchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Backend.Models.User", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Match");
-
-                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("Backend.Models.Post", b =>
@@ -312,15 +204,8 @@ namespace Backend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Backend.Models.Comment", b =>
-                {
-                    b.Navigation("Replies");
-                });
-
             modelBuilder.Entity("Backend.Models.Post", b =>
                 {
-                    b.Navigation("Comments");
-
                     b.Navigation("Reactions");
                 });
 #pragma warning restore 612, 618

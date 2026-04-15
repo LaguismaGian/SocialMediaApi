@@ -53,7 +53,8 @@ app.UseSwaggerUI();
 app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
 app.UseStaticFiles();
+app.MapControllers();
+
 
 app.Run();  

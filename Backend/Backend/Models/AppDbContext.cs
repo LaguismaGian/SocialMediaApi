@@ -10,7 +10,11 @@ namespace Backend.Models
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Post> Posts { get; set; }  
-        public DbSet<Person> People { get; set; } 
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Person> People { get; set; }
+        public DbSet<Reaction> Reactions { get; set; }  
+        public DbSet<Match> Matches { get; set; }
+        public DbSet<Message> Messages { get; set; }    
+        public DbSet<Comment> Comments { get; set; }
     }
 }

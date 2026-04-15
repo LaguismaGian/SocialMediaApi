@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Backend.Models
 {
     public class Post
@@ -9,5 +11,8 @@ namespace Backend.Models
         public DateTime CreatedAt { get; set; }
         
         public User? User { get; set; }
+        public ICollection<Reaction>? Reactions { get; set; }  
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        
     }
 }

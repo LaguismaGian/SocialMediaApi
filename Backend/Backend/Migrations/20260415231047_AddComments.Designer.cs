@@ -3,6 +3,7 @@ using System;
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260415231047_AddComments")]
+    partial class AddComments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
@@ -30,9 +33,6 @@ namespace Backend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("ParentCommentId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("PostId")
                         .HasColumnType("INTEGER");
 
@@ -40,8 +40,6 @@ namespace Backend.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ParentCommentId");
 
                     b.HasIndex("PostId");
 
@@ -221,12 +219,8 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Comment", b =>
                 {
-                    b.HasOne("Backend.Models.Comment", "ParentComment")
-                        .WithMany("Replies")
-                        .HasForeignKey("ParentCommentId");
-
                     b.HasOne("Backend.Models.Post", "Post")
-                        .WithMany("Comments")
+                        .WithMany()
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -236,8 +230,6 @@ namespace Backend.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("ParentComment");
 
                     b.Navigation("Post");
 
@@ -312,15 +304,8 @@ namespace Backend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Backend.Models.Comment", b =>
-                {
-                    b.Navigation("Replies");
-                });
-
             modelBuilder.Entity("Backend.Models.Post", b =>
                 {
-                    b.Navigation("Comments");
-
                     b.Navigation("Reactions");
                 });
 #pragma warning restore 612, 618

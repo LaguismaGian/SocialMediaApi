@@ -1,12 +1,45 @@
 import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
-import { NavLink } from "react-router";
+import { useState, useEffect } from 'react';
+import { NavLink, useLocation } from "react-router";
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    
-    // Check if user is logged in
-    const isLoggedIn = !!localStorage.getItem('token');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [profilePhoto, setProfilePhoto] = useState(null);
+    const [userName, setUserName] = useState('');
+    const location = useLocation();
+
+    useEffect(() => {
+        const loggedIn = !!localStorage.getItem('token');
+        setIsLoggedIn(loggedIn);
+        
+        if (loggedIn) {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            setUserName(user.name || '');
+            
+            const storedPhoto = localStorage.getItem('profilePhoto');
+            if (storedPhoto) {
+                setProfilePhoto(storedPhoto);
+            } else {
+                const fetchProfile = async () => {
+                    try {
+                        const token = localStorage.getItem('token');
+                        const response = await fetch(`http://localhost:3000/api/User/profile/${user.id}`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        const data = await response.json();
+                        if (data.profilePhoto) {
+                            setProfilePhoto(data.profilePhoto);
+                            localStorage.setItem('profilePhoto', data.profilePhoto);
+                        }
+                    } catch (error) {
+                        console.error('Failed to fetch profile photo');
+                    }
+                };
+                if (user.id) fetchProfile();
+            }
+        }
+    }, [location]);
 
     return (
         <header className="bg-white shadow-lg border-b border-gray-100 sticky top-0 z-50">
@@ -21,7 +54,7 @@ const Navbar = () => {
 
                     {/* Desktop Navigation */}
                     <nav className="hidden md:block">
-                        <div className="ml-10 flex items-baseline space-x-8">
+                        <div className="ml-10 flex items-center space-x-8">
                             <NavLink
                                 to='/'
                                 className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${isActive
@@ -33,13 +66,23 @@ const Navbar = () => {
                             </NavLink>
 
                             <NavLink
-                                to='/about'
+                                to='/matches'
                                 className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${isActive
                                     ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
                                     : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
                                     }`}
                             >
-                                About
+                                Matches
+                            </NavLink>
+
+                            <NavLink
+                                to='/chat'
+                                className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${isActive
+                                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                                    : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                                    }`}
+                            >
+                                Chat
                             </NavLink>
 
                             {isLoggedIn ? (
@@ -54,20 +97,26 @@ const Navbar = () => {
                                         Create Post
                                     </NavLink>
 
-                                    <NavLink
-                                        to='/profile/me'
-                                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${isActive
-                                            ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                                            : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
-                                            }`}
-                                    >
-                                        Profile
+                                    <NavLink to='/profile/me' className="flex items-center">
+                                        {profilePhoto ? (
+                                            <img 
+                                                src={`http://localhost:3000${profilePhoto}`} 
+                                                alt="Profile" 
+                                                className="w-9 h-9 rounded-full object-cover border-2 border-transparent hover:border-pink-500 transition-all duration-300"
+                                            />
+                                        ) : (
+                                            <div className="w-9 h-9 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-sm font-bold hover:scale-105 transition-all duration-300">
+                                                {userName?.charAt(0).toUpperCase() || 'U'}
+                                            </div>
+                                        )}
                                     </NavLink>
 
                                     <button
                                         onClick={() => {
                                             localStorage.removeItem('token');
                                             localStorage.removeItem('user');
+                                            localStorage.removeItem('profilePhoto');
+                                            setIsLoggedIn(false);
                                             window.location.href = '/login';
                                         }}
                                         className="px-4 py-2 rounded-full text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-300"
@@ -138,13 +187,23 @@ const Navbar = () => {
                     </NavLink>
 
                     <NavLink
-                        to="/about"
+                        to="/matches"
                         className={({ isActive }) => `block px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${isActive
                             ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105'
                             : 'text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-sm'
                             }`}
                     >
-                        About
+                        Matches
+                    </NavLink>
+
+                    <NavLink
+                        to="/chat"
+                        className={({ isActive }) => `block px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${isActive
+                            ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105'
+                            : 'text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-sm'
+                            }`}
+                    >
+                        Chat
                     </NavLink>
 
                     {isLoggedIn ? (
@@ -161,18 +220,32 @@ const Navbar = () => {
 
                             <NavLink
                                 to="/profile/me"
-                                className={({ isActive }) => `block px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${isActive
-                                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105'
-                                    : 'text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-sm'
-                                    }`}
+                                className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
+                                    isActive
+                                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105'
+                                        : 'text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-sm'
+                                }`}
                             >
-                                Profile
+                                {profilePhoto ? (
+                                    <img 
+                                        src={`http://localhost:3000${profilePhoto}`} 
+                                        alt="Profile" 
+                                        className="w-8 h-8 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                                        {userName?.charAt(0).toUpperCase() || 'U'}
+                                    </div>
+                                )}
+                                <span>Profile</span>
                             </NavLink>
 
                             <button
                                 onClick={() => {
                                     localStorage.removeItem('token');
                                     localStorage.removeItem('user');
+                                    localStorage.removeItem('profilePhoto');
+                                    setIsLoggedIn(false);
                                     window.location.href = '/login';
                                 }}
                                 className="block w-full text-left px-4 py-3 rounded-lg text-base font-medium text-red-600 hover:text-red-700 hover:bg-white hover:shadow-sm transition-all duration-200"
