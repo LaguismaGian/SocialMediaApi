@@ -1,5 +1,8 @@
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -24,6 +27,20 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new() { Title = "My API", Version = "v1" });
 });
 
+builder.Services.AddAuthentication().AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});builder.Services.AddAuthorization();
+
 string connectionString = builder.Configuration.GetConnectionString("Default") ?? throw new ArgumentNullException("connectionString is null");
 
 builder.Services.AddDbContext<AppDbContext>(op => op.UseSqlite(connectionString));
@@ -34,6 +51,9 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseCors(MyAllowSpecificOrigins);
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
+app.UseStaticFiles();
 
-app.Run();
+app.Run();  

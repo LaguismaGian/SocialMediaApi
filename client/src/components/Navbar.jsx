@@ -4,6 +4,10 @@ import { NavLink } from "react-router";
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    
+    // Check if user is logged in
+    const isLoggedIn = !!localStorage.getItem('token');
+
     return (
         <header className="bg-white shadow-lg border-b border-gray-100 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -11,7 +15,7 @@ const Navbar = () => {
                     {/* Brand Logo */}
                     <div className="flex-shrink-0">
                         <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-purple-600 hover:to-blue-600 transition-all duration-300 cursor-pointer">
-                            Person CRUD
+                            VibeZone
                         </h1>
                     </div>
 
@@ -20,18 +24,16 @@ const Navbar = () => {
                         <div className="ml-10 flex items-baseline space-x-8">
                             <NavLink
                                 to='/'
-
                                 className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${isActive
                                     ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
                                     : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
                                     }`}
                             >
-                                Home
+                                Feed
                             </NavLink>
 
                             <NavLink
                                 to='/about'
-
                                 className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${isActive
                                     ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
                                     : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
@@ -40,16 +42,62 @@ const Navbar = () => {
                                 About
                             </NavLink>
 
-                            <NavLink
-                                to='/person'
+                            {isLoggedIn ? (
+                                <>
+                                    <NavLink
+                                        to='/create-post'
+                                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${isActive
+                                            ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                                            : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                                            }`}
+                                    >
+                                        Create Post
+                                    </NavLink>
 
-                                className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${isActive
-                                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                                    : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
-                                    }`}
-                            >
-                                Person
-                            </NavLink>
+                                    <NavLink
+                                        to='/profile/me'
+                                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${isActive
+                                            ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                                            : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                                            }`}
+                                    >
+                                        Profile
+                                    </NavLink>
+
+                                    <button
+                                        onClick={() => {
+                                            localStorage.removeItem('token');
+                                            localStorage.removeItem('user');
+                                            window.location.href = '/login';
+                                        }}
+                                        className="px-4 py-2 rounded-full text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-300"
+                                    >
+                                        Logout
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <NavLink
+                                        to='/login'
+                                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${isActive
+                                            ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                                            : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                                            }`}
+                                    >
+                                        Login
+                                    </NavLink>
+
+                                    <NavLink
+                                        to='/signup'
+                                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${isActive
+                                            ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                                            : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                                            }`}
+                                    >
+                                        Signup
+                                    </NavLink>
+                                </>
+                            )}
                         </div>
                     </nav>
 
@@ -74,7 +122,7 @@ const Navbar = () => {
             {/* Mobile Navigation Menu */}
             <div
                 className={`md:hidden transition-all duration-300 ease-in-out ${isMenuOpen
-                    ? 'max-h-64 opacity-100 visible'
+                    ? 'max-h-96 opacity-100 visible'
                     : 'max-h-0 opacity-0 invisible overflow-hidden'
                     }`}
             >
@@ -86,7 +134,7 @@ const Navbar = () => {
                             : 'text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-sm'
                             }`}
                     >
-                        Home
+                        Feed
                     </NavLink>
 
                     <NavLink
@@ -99,15 +147,62 @@ const Navbar = () => {
                         About
                     </NavLink>
 
-                    <NavLink
-                        to="/person"
-                        className={({ isActive }) => `block px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${isActive
-                            ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105'
-                            : 'text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-sm'
-                            }`}
-                    >
-                        Person
-                    </NavLink>
+                    {isLoggedIn ? (
+                        <>
+                            <NavLink
+                                to="/create-post"
+                                className={({ isActive }) => `block px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${isActive
+                                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105'
+                                    : 'text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-sm'
+                                    }`}
+                            >
+                                Create Post
+                            </NavLink>
+
+                            <NavLink
+                                to="/profile/me"
+                                className={({ isActive }) => `block px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${isActive
+                                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105'
+                                    : 'text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-sm'
+                                    }`}
+                            >
+                                Profile
+                            </NavLink>
+
+                            <button
+                                onClick={() => {
+                                    localStorage.removeItem('token');
+                                    localStorage.removeItem('user');
+                                    window.location.href = '/login';
+                                }}
+                                className="block w-full text-left px-4 py-3 rounded-lg text-base font-medium text-red-600 hover:text-red-700 hover:bg-white hover:shadow-sm transition-all duration-200"
+                            >
+                                Logout
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <NavLink
+                                to="/login"
+                                className={({ isActive }) => `block px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${isActive
+                                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105'
+                                    : 'text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-sm'
+                                    }`}
+                            >
+                                Login
+                            </NavLink>
+
+                            <NavLink
+                                to="/signup"
+                                className={({ isActive }) => `block px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${isActive
+                                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105'
+                                    : 'text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-sm'
+                                    }`}
+                            >
+                                Signup
+                            </NavLink>
+                        </>
+                    )}
                 </div>
             </div>
 
