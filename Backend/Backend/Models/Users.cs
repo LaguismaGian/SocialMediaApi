@@ -12,5 +12,6 @@ namespace Backend.Models
         public string? Interests { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? ProfilePhoto { get; set; }
+        
     }
 }
