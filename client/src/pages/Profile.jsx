@@ -54,15 +54,13 @@ const Profile = () => {
   }
 
   const handleDeletePost = async (postId) => {
-    if (!confirm('Are you sure you want to delete this post?')) return;
+    if (!confirm('Delete this post?')) return;
     
     try {
       const token = localStorage.getItem('token')
       const response = await fetch(`http://localhost:3000/api/Post/${postId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       
       if (response.ok) {
@@ -111,9 +109,7 @@ const Profile = () => {
       const token = localStorage.getItem('token')
       const response = await fetch(`http://localhost:3000/api/Post/${postId}/interested`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       })
       const data = await response.json()
       
@@ -130,7 +126,7 @@ const Profile = () => {
       if (data.isMatch) {
         toast.success('It\'s a match! 🎉')
       } else {
-        toast.success(data.liked ? 'Interested! ❤️' : 'Removed interest')
+        toast.success(data.liked ? 'Interested ❤️' : 'Removed interest')
       }
     } catch (error) {
       toast.error('Something went wrong')
@@ -175,9 +171,7 @@ const Profile = () => {
       const token = localStorage.getItem('token')
       const response = await fetch('http://localhost:3000/api/User/upload-photo', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData
       })
       const data = await response.json()
@@ -195,171 +189,177 @@ const Profile = () => {
     }
   }
 
-  if (loading) return <div className="p-6">Loading...</div>
-  if (!profile) return <div className="p-6">User not found</div>
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="text-center">
+        <div className="w-10 h-10 border-2 border-blue-400 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+        <p className="text-gray-400 text-sm">Loading...</p>
+      </div>
+    </div>
+  )
+  
+  if (!profile) return (
+    <div className="text-center py-16">
+      <p className="text-gray-400">User not found</p>
+    </div>
+  )
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      {/* Profile Header */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <div className="flex items-center gap-4 mb-4">
-          {profile.profilePhoto ? (
-            <img 
-              src={`http://localhost:3000${profile.profilePhoto}`} 
-              alt="Profile" 
-              className="w-20 h-20 rounded-full object-cover"
-            />
-          ) : (
-            <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-3xl font-bold">
-              {profile.name?.charAt(0).toUpperCase()}
-            </div>
-          )}
-          <div>
-            <h2 className="text-2xl font-bold">{profile.name}</h2>
-            <p className="text-gray-500">@{profile.email?.split('@')[0]}</p>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white pb-10">
+      <div className="max-w-md mx-auto px-4 pt-6">
+        {/* Profile Header */}
+        <div className="text-center mb-6">
+          <div className="relative inline-block mb-3">
+            {profile.profilePhoto ? (
+              <img 
+                src={`http://localhost:3000${profile.profilePhoto}`} 
+                alt="Profile" 
+                className="w-24 h-24 rounded-full object-cover ring-4 ring-white shadow-lg"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center text-white text-3xl font-bold ring-4 ring-white shadow-lg">
+                {profile.name?.charAt(0).toUpperCase()}
+              </div>
+            )}
+            {isOwnProfile && (
+              <label className="absolute bottom-0 right-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-1.5 cursor-pointer shadow-md hover:from-blue-600 hover:to-purple-600 transition">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" disabled={uploadingPhoto} />
+              </label>
+            )}
           </div>
-        </div>
-        
-        <p className="text-gray-700 mb-4">{profile.bio || 'No bio yet'}</p>
-        
-        {isOwnProfile && !isEditing && (
-          <div className="flex gap-2">
+          
+          <h2 className="text-xl font-bold text-gray-900">{profile.name}</h2>
+          <p className="text-sm text-gray-400">@{profile.email?.split('@')[0]}</p>
+          <p className="text-sm text-gray-600 mt-2 max-w-xs mx-auto">{profile.bio || 'No bio yet'}</p>
+          
+          {isOwnProfile && !isEditing && (
             <button
               onClick={() => setIsEditing(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+              className="mt-4 px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full text-sm font-medium hover:from-blue-600 hover:to-purple-600 transition shadow-sm"
             >
               Edit Profile
             </button>
-            <label className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 cursor-pointer">
-              {uploadingPhoto ? 'Uploading...' : 'Change Photo'}
-              <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" disabled={uploadingPhoto} />
-            </label>
+          )}
+        </div>
+
+        {/* Edit Form Modal */}
+        {isEditing && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl max-w-md w-full p-6">
+              <h3 className="text-lg font-bold mb-4">Edit Profile</h3>
+              <form onSubmit={handleUpdateProfile}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <input
+                    type="text"
+                    value={editForm.name}
+                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-purple-400"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                  <textarea
+                    value={editForm.bio}
+                    onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-purple-400"
+                    rows="3"
+                    placeholder="Tell us about yourself..."
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button type="submit" className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white py-2 rounded-xl text-sm font-medium hover:from-blue-600 hover:to-purple-600 transition">
+                    Save
+                  </button>
+                  <button type="button" onClick={() => setIsEditing(false)} className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-xl text-sm font-medium hover:bg-gray-200 transition">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
-      </div>
 
-      {/* Edit Form */}
-      {isEditing && (
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h3 className="text-xl font-bold mb-4">Edit Profile</h3>
-          <form onSubmit={handleUpdateProfile}>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Name</label>
-              <input
-                type="text"
-                value={editForm.name}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                className="w-full p-2 border rounded-lg"
-              />
+        {/* Posts Section */}
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Posts</h3>
+            <span className="text-xs text-gray-400">{posts.length} posts</span>
+          </div>
+          
+          {posts.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-2xl shadow-sm">
+              <p className="text-gray-400 text-sm">No posts yet</p>
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Bio</label>
-              <textarea
-                value={editForm.bio}
-                onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
-                className="w-full p-2 border rounded-lg"
-                rows="3"
-                placeholder="Tell us about yourself..."
-              />
-            </div>
-            <div className="flex gap-2">
-              <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
-                Save
-              </button>
-              <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400">
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* User's Posts */}
-      <div>
-        <h3 className="text-xl font-bold mb-4">Posts</h3>
-        {posts.length === 0 ? (
-          <p className="text-gray-500">No posts yet</p>
-        ) : (
-          posts.map(post => (
-            <div key={post.id} className="border rounded-lg p-4 mb-4 shadow-sm relative">
-              {isOwnProfile && (
-                <div className="absolute top-2 right-2 flex gap-1">
-                  <button
-                    onClick={() => {
-                      setEditingPost(post.id)
-                      setEditContent(post.content)
-                    }}
-                    className="text-gray-400 hover:text-blue-500 transition p-1"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => handleDeletePost(post.id)}
-                    className="text-gray-400 hover:text-red-500 transition p-1"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                </div>
-              )}
-              
-              {editingPost === post.id ? (
-                <div>
-                  <textarea
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                    className="w-full p-2 border rounded-lg mb-2"
-                    rows="3"
-                  />
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleUpdatePost(post.id)}
-                      className="bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => setEditingPost(null)}
-                      className="bg-gray-300 text-gray-700 px-3 py-1 rounded-lg text-sm hover:bg-gray-400"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <p className="mb-2">{post.content}</p>
-                  {post.imageUrl && (
-                    <img src={`http://localhost:3000${post.imageUrl}`} alt="Post" className="mt-2 max-h-96 rounded-lg" />
+          ) : (
+            <div className="space-y-4">
+              {posts.map(post => (
+                <div key={post.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                  {editingPost === post.id ? (
+                    <div className="p-4">
+                      <textarea
+                        value={editContent}
+                        onChange={(e) => setEditContent(e.target.value)}
+                        className="w-full p-3 border border-gray-200 rounded-xl mb-3 focus:outline-none focus:ring-1 focus:ring-purple-400"
+                        rows="3"
+                      />
+                      <div className="flex gap-2">
+                        <button onClick={() => handleUpdatePost(post.id)} className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white py-2 rounded-xl text-sm font-medium hover:from-blue-600 hover:to-purple-600 transition">
+                          Save
+                        </button>
+                        <button onClick={() => setEditingPost(null)} className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-xl text-sm font-medium hover:bg-gray-200 transition">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="p-4">
+                        <p className="text-sm text-gray-700 leading-relaxed">{post.content}</p>
+                        {post.imageUrl && (
+                          <img src={`http://localhost:3000${post.imageUrl}`} alt="Post" className="mt-3 rounded-xl w-full" />
+                        )}
+                        <div className="flex items-center justify-between mt-3">
+                          <button
+                            onClick={() => handleInterested(post.id)}
+                            disabled={liking[post.id]}
+                            className={`flex items-center gap-1.5 text-sm transition ${
+                              post.userLiked ? 'text-purple-500' : 'text-gray-400 hover:text-purple-400'
+                            }`}
+                          >
+                            <span className="text-lg">{post.userLiked ? '❤️' : '♡'}</span>
+                            <span>{post.likesCount || 0}</span>
+                          </button>
+                          <span className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      {isOwnProfile && (
+                        <div className="border-t border-gray-50 flex">
+                          <button
+                            onClick={() => {
+                              setEditingPost(post.id)
+                              setEditContent(post.content)
+                            }}
+                            className="flex-1 py-2 text-center text-sm text-gray-500 hover:text-purple-500 transition"
+                          >
+                            Edit
+                          </button>
+                          <button onClick={() => handleDeletePost(post.id)} className="flex-1 py-2 text-center text-sm text-gray-500 hover:text-red-500 transition">
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </>
                   )}
-                  
-                  {/* Heart Button */}
-                  <div className="flex items-center gap-2 mt-3">
-                    <button
-                      onClick={() => handleInterested(post.id)}
-                      disabled={liking[post.id]}
-                      className={`flex items-center gap-1 px-3 py-1 rounded-full transition ${
-                        post.userLiked 
-                          ? 'bg-pink-500 text-white' 
-                          : 'bg-gray-200 text-gray-700 hover:bg-pink-100'
-                      }`}
-                    >
-                      <span className="text-xl">{post.userLiked ? '❤️' : '♡'}</span>
-                      <span>{post.likesCount || 0}</span>
-                    </button>
-                  </div>
-                  
-                  <div className="text-sm text-gray-500 mt-2">
-                    {new Date(post.createdAt).toLocaleString()}
-                  </div>
-                </>
-              )}
+                </div>
+              ))}
             </div>
-          ))
-        )}
+          )}
+        </div>
       </div>
     </div>
   )
