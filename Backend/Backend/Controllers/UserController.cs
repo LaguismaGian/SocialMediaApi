@@ -93,7 +93,7 @@ namespace Backend.Controllers
         {
             var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var currentUserIdInt = currentUserId != null ? int.Parse(currentUserId) : 0;
-
+        
             var posts = await _context.Posts
                 .Where(p => p.UserId == id)
                 .OrderByDescending(p => p.CreatedAt)
@@ -104,10 +104,11 @@ namespace Backend.Controllers
                     p.ImageUrl, 
                     p.CreatedAt,
                     LikesCount = p.Reactions.Count(r => r.Type == "interested"),
-                    UserLiked = p.Reactions.Any(r => r.UserId == currentUserIdInt && r.Type == "interested")
+                    UserLiked = p.Reactions.Any(r => r.UserId == currentUserIdInt && r.Type == "interested"),
+                    CommentsCount = p.Comments.Count  // ADD THIS LINE
                 })
                 .ToListAsync();
-
+        
             return Ok(posts);
         }
     }

@@ -13,5 +13,7 @@ namespace Backend.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? ProfilePhoto { get; set; }
         
+        public string? Role { get; set; } = "User";
+        public bool IsBanned { get; set; } = false;
     }
 }

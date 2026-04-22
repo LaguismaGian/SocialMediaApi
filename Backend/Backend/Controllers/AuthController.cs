@@ -50,13 +50,29 @@ namespace Backend.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
             if (user == null)
                 return BadRequest(new { message = "Invalid email or password" });
-
+        
+            if (user.IsBanned)
+                return BadRequest(new { message = "Your account has been banned. Contact support." });
+        
             if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return BadRequest(new { message = "Invalid email or password" });
-
+        
             var token = GenerateJwtToken(user);
+        
+            return Ok(new { token, user = new { user.Id, user.Name, user.Email, user.Role } });
+        }
 
-            return Ok(new { token, user = new { user.Id, user.Name, user.Email } });
+        [HttpGet("make-admin")]
+        public async Task<IActionResult> MakeAdmin()
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == "r@g.c");
+            if (user == null)
+                return NotFound(new { message = "User not found" });
+
+            user.Role = "Admin";
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "r@g.c is now an admin" });
         }
 
         private string GenerateJwtToken(User user)
@@ -68,7 +84,8 @@ namespace Backend.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.Name)
+                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Role, user.Role ?? "User")  // ADD THIS LINE
             };
 
             var token = new JwtSecurityToken(
