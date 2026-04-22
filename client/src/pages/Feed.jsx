@@ -13,6 +13,7 @@ const Feed = () => {
   const [submitting, setSubmitting] = useState({})
   const [replyingTo, setReplyingTo] = useState({})
   const [replyContent, setReplyContent] = useState({})
+  const [selectedImage, setSelectedImage] = useState(null)
 
   useEffect(() => {
     fetchPosts()
@@ -249,122 +250,145 @@ const Feed = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-          Discover
-        </h2>
-        <p className="text-gray-500 mt-1">Find someone who vibes with you</p>
-      </div>
+    <>
+      <div className="max-w-2xl mx-auto py-8 px-4">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+            Discover
+          </h2>
+          <p className="text-gray-500 mt-1">Find someone who vibes with you</p>
+        </div>
 
-      <div className="space-y-6">
-        {posts.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-2xl shadow-sm">
-            <div className="text-6xl mb-4">😢</div>
-            <p className="text-gray-500">No posts yet. Be the first to share!</p>
-          </div>
-        ) : (
-          posts.map(post => (
-            <div key={post.id} className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-              {/* Post header - Clickable profile */}
-              <div className="p-4 flex items-center gap-3">
-                <div 
-                  onClick={() => navigate(`/profile/${post.user?.id}`)}
-                  className="cursor-pointer"
-                >
-                  {post.user?.profilePhoto ? (
-                    <img 
-                      src={`http://localhost:3000${post.user.profilePhoto}`} 
-                      alt={post.user.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 flex items-center justify-center text-white font-bold">
-                      {post.user?.name?.charAt(0).toUpperCase() || 'U'}
-                    </div>
-                  )}
-                </div>
-                <div>
+        <div className="space-y-6">
+          {posts.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-2xl shadow-sm">
+              <div className="text-6xl mb-4">😢</div>
+              <p className="text-gray-500">No posts yet. Be the first to share!</p>
+            </div>
+          ) : (
+            posts.map(post => (
+              <div key={post.id} className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                {/* Post header - Clickable profile */}
+                <div className="p-4 flex items-center gap-3">
                   <div 
                     onClick={() => navigate(`/profile/${post.user?.id}`)}
-                    className="font-semibold text-gray-900 cursor-pointer hover:text-pink-500 transition"
+                    className="cursor-pointer"
                   >
-                    {post.user?.name || 'User'}
-                  </div>
-                  <div className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleDateString()}</div>
-                </div>
-              </div>
-
-              <p className="px-4 pb-3 text-gray-700">{post.content}</p>
-              
-              {post.imageUrl && (
-                <div className="bg-gray-100">
-                  <img 
-                    src={`http://localhost:3000${post.imageUrl}`} 
-                    alt="Post" 
-                    className="w-full object-cover max-h-96"
-                  />
-                </div>
-              )}
-              
-              <div className="p-4 border-t flex items-center gap-4">
-                <button
-                  onClick={() => handleInterested(post.id)}
-                  disabled={liking[post.id]}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${
-                    post.userLiked 
-                      ? 'bg-pink-500 text-white shadow-md scale-105' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-pink-100 hover:scale-105'
-                  }`}
-                >
-                  <span className="text-xl">{post.userLiked ? '❤️' : '♡'}</span>
-                  <span className="font-medium">{post.likesCount || 0}</span>
-                </button>
-                
-                <button
-                  onClick={() => toggleComments(post.id)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-300"
-                >
-                  <span className="text-xl">💬</span>
-                  <span className="font-medium">{post.commentsCount || 0}</span>
-                </button>
-              </div>
-
-              {showComments[post.id] && (
-                <div className="border-t p-4 bg-gray-50">
-                  <div className="space-y-3 mb-4 max-h-96 overflow-y-auto">
-                    {comments[post.id]?.length === 0 ? (
-                      <p className="text-gray-400 text-sm">No comments yet</p>
+                    {post.user?.profilePhoto ? (
+                      <img 
+                        src={`http://localhost:3000${post.user.profilePhoto}`} 
+                        alt={post.user.name}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
                     ) : (
-                      comments[post.id]?.map(comment => renderComment(comment, post.id))
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                        {post.user?.name?.charAt(0).toUpperCase() || 'U'}
+                      </div>
                     )}
                   </div>
-
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={newComment[post.id] || ''}
-                      onChange={(e) => setNewComment(prev => ({ ...prev, [post.id]: e.target.value }))}
-                      onKeyPress={(e) => e.key === 'Enter' && handleAddComment(post.id)}
-                      placeholder="Write a comment..."
-                      className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"
-                      disabled={submitting[post.id]}
-                    />
-                    <button
-                      onClick={() => handleAddComment(post.id)}
-                      disabled={submitting[post.id] || !newComment[post.id]?.trim()}
-                      className="bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 disabled:opacity-50 transition text-sm"
+                  <div>
+                    <div 
+                      onClick={() => navigate(`/profile/${post.user?.id}`)}
+                      className="font-semibold text-gray-900 cursor-pointer hover:text-pink-500 transition"
                     >
-                      {submitting[post.id] ? '...' : 'Post'}
-                    </button>
+                      {post.user?.name || 'User'}
+                    </div>
+                    <div className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleDateString()}</div>
                   </div>
                 </div>
-              )}
-            </div>
-          ))
-        )}
+
+                <p className="px-4 pb-3 text-gray-700">{post.content}</p>
+                
+                {/* Clickable Image */}
+                {post.imageUrl && (
+                  <div className="bg-gray-100 cursor-pointer" onClick={() => setSelectedImage(`http://localhost:3000${post.imageUrl}`)}>
+                    <img 
+                      src={`http://localhost:3000${post.imageUrl}`} 
+                      alt="Post" 
+                      className="w-full object-cover max-h-96 hover:opacity-90 transition"
+                    />
+                  </div>
+                )}
+                
+                <div className="p-4 border-t flex items-center gap-4">
+                  <button
+                    onClick={() => handleInterested(post.id)}
+                    disabled={liking[post.id]}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${
+                      post.userLiked 
+                        ? 'bg-pink-500 text-white shadow-md scale-105' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-pink-100 hover:scale-105'
+                    }`}
+                  >
+                    <span className="text-xl">{post.userLiked ? '❤️' : '♡'}</span>
+                    <span className="font-medium">{post.likesCount || 0}</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => toggleComments(post.id)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-300"
+                  >
+                    <span className="text-xl">💬</span>
+                    <span className="font-medium">{post.commentsCount || 0}</span>
+                  </button>
+                </div>
+
+                {showComments[post.id] && (
+                  <div className="border-t p-4 bg-gray-50">
+                    <div className="space-y-3 mb-4 max-h-96 overflow-y-auto">
+                      {comments[post.id]?.length === 0 ? (
+                        <p className="text-gray-400 text-sm">No comments yet</p>
+                      ) : (
+                        comments[post.id]?.map(comment => renderComment(comment, post.id))
+                      )}
+                    </div>
+
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newComment[post.id] || ''}
+                        onChange={(e) => setNewComment(prev => ({ ...prev, [post.id]: e.target.value }))}
+                        onKeyPress={(e) => e.key === 'Enter' && handleAddComment(post.id)}
+                        placeholder="Write a comment..."
+                        className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"
+                        disabled={submitting[post.id]}
+                      />
+                      <button
+                        onClick={() => handleAddComment(post.id)}
+                        disabled={submitting[post.id] || !newComment[post.id]?.trim()}
+                        className="bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 disabled:opacity-50 transition text-sm"
+                      >
+                        {submitting[post.id] ? '...' : 'Post'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
       </div>
-    </div>
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-pointer"
+          onClick={() => setSelectedImage(null)}
+        >
+          <img 
+            src={selectedImage} 
+            alt="Full size" 
+            className="max-w-full max-h-full object-contain"
+          />
+          <button 
+            className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300 transition"
+            onClick={() => setSelectedImage(null)}
+          >
+            ×
+          </button>
+        </div>
+      )}
+    </>
   )
 }
 

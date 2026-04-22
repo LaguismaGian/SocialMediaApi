@@ -7,6 +7,7 @@ const Navbar = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [profilePhoto, setProfilePhoto] = useState(null);
     const [userName, setUserName] = useState('');
+    const [userRole, setUserRole] = useState('');
     const location = useLocation();
 
     useEffect(() => {
@@ -16,6 +17,7 @@ const Navbar = () => {
         if (loggedIn) {
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             setUserName(user.name || '');
+            setUserRole(user.role || '');
             
             const storedPhoto = localStorage.getItem('profilePhoto');
             if (storedPhoto) {
@@ -84,6 +86,19 @@ const Navbar = () => {
                             >
                                 Chat
                             </NavLink>
+
+                            {/* Admin Link - only visible to admins */}
+                            {isLoggedIn && userRole === 'Admin' && (
+                                <NavLink
+                                    to='/admin'
+                                    className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${isActive
+                                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                                        : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                                        }`}
+                                >
+                                    Admin
+                                </NavLink>
+                            )}
 
                             {isLoggedIn ? (
                                 <>
@@ -205,6 +220,19 @@ const Navbar = () => {
                     >
                         Chat
                     </NavLink>
+
+                    {/* Admin Link - Mobile */}
+                    {isLoggedIn && userRole === 'Admin' && (
+                        <NavLink
+                            to="/admin"
+                            className={({ isActive }) => `block px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${isActive
+                                ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105'
+                                : 'text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-sm'
+                                }`}
+                        >
+                            Admin
+                        </NavLink>
+                    )}
 
                     {isLoggedIn ? (
                         <>

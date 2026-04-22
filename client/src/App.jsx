@@ -12,6 +12,7 @@ import { Routes, Route } from "react-router";
 import { Toaster } from 'react-hot-toast';
 import Matches from './pages/Matches' 
 import Chat from './pages/Chat'
+import Admin from './pages/Admin'
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
         <Route path="*" element={<NotFound />} />
         <Route path="matches" element={<Matches />} />
         <Route path="chat" element={<Chat />} />
+        <Route path="admin" element={<Admin />} />
         
       </Routes>
 
